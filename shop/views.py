@@ -1,9 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
-from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer
+from .models import Car, Cart, CartItem
+from .serializers import CarSerializer, CartSerializer, CartItemSerializer, UserSerializer
+from django.shortcuts import get_object_or_404
 
 class UserCreate(APIView):
     def post(self, request, format=None):
@@ -29,3 +31,39 @@ class UserLogout(APIView):
         request.user.auth_token.delete()
         logout(request)
         return Response(status=status.HTTP_200_OK)
+    
+class ProductListView(generics.ListAPIView):
+    queryset = Car.objects.all()
+    serializer_class = CarSerializer
+
+class AddToCartView(APIView):
+    def post(self, request, Car_id):
+        Car = get_object_or_404(Car, id=Car_id)
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=Car)
+        if not created:
+            cart_item.quantity += 1
+        cart_item.save()
+        return Response({'status': 'Added to cart'}, status=status.HTTP_200_OK)
+
+class CartDetailView(generics.RetrieveAPIView):
+    serializer_class = CartSerializer
+
+    def get_object(self):
+        return get_object_or_404(Cart, user=self.request.user)
+
+class UpdateCartItemView(APIView):
+    def post(self, request, item_id):
+        cart_item = get_object_or_404(CartItem, id=item_id)
+        cart_item.quantity = request.data.get('quantity', cart_item.quantity)
+        if cart_item.quantity <= 0:
+            cart_item.delete()
+        else:
+            cart_item.save()
+        return Response({'status': 'Cart updated'}, status=status.HTTP_200_OK)
+
+class CheckoutView(APIView):
+    def post(self, request):
+        cart = get_object_or_404(Cart, user=request.user)
+        cart.items.all().delete()  # Clear the cart after checkout
+        return Response({'status': 'Checkout successful'}, status=status.HTTP_200_OK)
