@@ -38,9 +38,9 @@ class CarListView(generics.ListAPIView):
 
 class AddToCartView(APIView):
     def post(self, request, Car_id):
-        Cars = get_object_or_404(Cars, id=Car_id)
+        car = get_object_or_404(Car, id=Car_id)
         cart, _ = Cart.objects.get_or_create(user=request.user)
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=Cars)
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=car)
         if not created:
             cart_item.quantity += 1
         cart_item.save()
@@ -55,11 +55,19 @@ class CartDetailView(generics.RetrieveAPIView):
 class UpdateCartItemView(APIView):
     def post(self, request, item_id):
         cart_item = get_object_or_404(CartItem, id=item_id)
-        cart_item.quantity = request.data.get('quantity', cart_item.quantity)
-        if cart_item.quantity <= 0:
+        
+        # Ensure quantity is an integer
+        try:
+            quantity = int(request.data.get('quantity', cart_item.quantity))
+        except ValueError:
+            return Response({'error': 'Invalid quantity'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if quantity <= 0:
             cart_item.delete()
         else:
+            cart_item.quantity = quantity
             cart_item.save()
+        
         return Response({'status': 'Cart updated'}, status=status.HTTP_200_OK)
 
 class CheckoutView(APIView):

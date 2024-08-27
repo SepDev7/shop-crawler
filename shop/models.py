@@ -6,13 +6,14 @@ class Car(models.Model):
     title = models.CharField(max_length=255)
     price = models.CharField(max_length=255)
     image_url = models.CharField(max_length=255)
+    # stock = models.IntegerField()
 
     class Meta:
-        managed = False  # This tells Django not to manage (create/delete) this table
+        managed = True  # This tells Django not to manage (create/delete) this table
         db_table = 'cars'  # The name of the table in your database
 
     def __str__(self):
-        return self.name
+        return self.title
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -26,4 +27,4 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return f"{self.product.name} - {self.quantity}"
+        return f"{self.product.title} - {self.quantity}"
