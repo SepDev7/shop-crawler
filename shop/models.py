@@ -2,13 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Car(models.Model):
-    title = models.CharField(max_length=255)
-    price = models.CharField(max_length=50)
-    image_url = models.URLField(blank=True, null=True)
-    stock = models.IntegerField()
+    # Define fields that map to the columns in your "cars" table
+    name = models.CharField(max_length=255)
+    brand = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    # Add other fields as necessary
+
+    class Meta:
+        managed = False  # This tells Django not to manage (create/delete) this table
+        db_table = 'cars'  # The name of the table in your database
 
     def __str__(self):
-        return self.title
+        return self.name
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

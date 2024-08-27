@@ -14,10 +14,11 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(**validated_data)
         return user
     
+
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
-        fields = ['id', 'title', 'image_url', 'price', 'stock']
+        fields = '__all__'  # This will include all fields in the JSON output
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = CarSerializer()

@@ -32,15 +32,15 @@ class UserLogout(APIView):
         logout(request)
         return Response(status=status.HTTP_200_OK)
     
-class ProductListView(generics.ListAPIView):
+class CarListView(generics.ListAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
 
 class AddToCartView(APIView):
     def post(self, request, Car_id):
-        Car = get_object_or_404(Car, id=Car_id)
+        Cars = get_object_or_404(Cars, id=Car_id)
         cart, _ = Cart.objects.get_or_create(user=request.user)
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=Car)
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=Cars)
         if not created:
             cart_item.quantity += 1
         cart_item.save()
