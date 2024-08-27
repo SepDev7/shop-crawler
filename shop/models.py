@@ -3,10 +3,9 @@ from django.contrib.auth.models import User
 
 class Car(models.Model):
     # Define fields that map to the columns in your "cars" table
-    name = models.CharField(max_length=255)
-    brand = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    # Add other fields as necessary
+    title = models.CharField(max_length=255)
+    price = models.CharField(max_length=255)
+    image_url = models.CharField(max_length=255)
 
     class Meta:
         managed = False  # This tells Django not to manage (create/delete) this table
