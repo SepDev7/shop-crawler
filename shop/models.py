@@ -9,7 +9,7 @@ class Car(models.Model):
     # stock = models.IntegerField()
 
     class Meta:
-        managed = True  # This tells Django not to manage (create/delete) this table
+        managed = False  # This tells Django not to manage (create/delete) this table
         db_table = 'cars'  # The name of the table in your database
 
     def __str__(self):
