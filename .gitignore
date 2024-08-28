@@ -1,0 +1,86 @@
+# Python/Django
+
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.env
+.env
+*.envrc
+*.venv
+*.DS_Store
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+*.pot
+*.mo
+
+# If you're using the SQLite database (uncomment if needed)
+# db.sqlite3
+# db.sqlite3-journal
+
+# Django stuff:
+*.log
+staticfiles/
+media/
+
+# Ignore all local environment settings
+local_settings.py
+settings_local.py
+
+# Ignore the virtual environment folder
+myenv/
+venv/
+env/
+ENV/
+env.bak/
+env.bak.bak/
+
+# Ignore Django migration files
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Ignore node_modules folder if you're using Node.js (e.g., for frontend assets)
+node_modules/
+
+# Ignore coverage reports
+htmlcov/
+.tox/
+.coverage
+coverage.xml
+.cache
+nosetests.xml
+coverage/
+*.cover
+.hypothesis/
+
+# Ignore JetBrains IDEs settings
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Ignore Visual Studio Code settings
+.vscode/
+
+# Ignore Python test cache files
+.cache/
+.pytest_cache/
+test-results/
+
+# Ignore yarn.lock file if using Yarn
+yarn.lock
+
+# Ignore dotenv configuration files (if any)
+.env.*
+
+# Ignore specific project or framework related files
+**/__pycache__/
+**/*.py[cod]
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
