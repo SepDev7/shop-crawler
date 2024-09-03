@@ -1,3 +1,4 @@
+from unittest import TestCase
 import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -5,6 +6,14 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token  # Ensure this is correctly imported
 from .models import Car, Cart, CartItem
+import asyncio
+from unittest.mock import AsyncMock, MagicMock, patch
+from django.db import transaction
+from asgiref.sync import sync_to_async
+from aioresponses import aioresponses
+import aiohttp
+from .models import Car
+from .tasks import fetch_page, scrape_page, save_to_db
 
 @pytest.fixture
 def api_client():
@@ -180,3 +189,63 @@ def test_checkout_empty_cart():
     response = client.post(url)
     
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class CrawlerTests(TestCase):
+
+    @pytest.mark.asyncio
+    async def test_fetch_page_html(self):
+        mock_response = """
+        <html>
+            <head><script type="application/json">{"data": {"ads": [{"detail": {"title": "Car Title", "image": "http://example.com/image.jpg"}, "price": {"price": "10000"}}]}}</script></head>
+            <body></body>
+        </html>
+        """
+        with aioresponses() as mock:
+            mock.get('https://example.com', body=mock_response, headers={'Content-Type': 'text/html'})
+            async with aiohttp.ClientSession() as session:
+                data = await fetch_page(session, 'https://example.com')
+                self.assertIsNotNone(data)
+                self.assertEqual(data['data']['ads'][0]['detail']['title'], 'Car Title')
+                self.assertEqual(data['data']['ads'][0]['price']['price'], '10000')
+
+    @pytest.mark.asyncio
+    async def test_scrape_page(self):
+        mock_response = {
+            "data": {
+                "ads": [
+                    {
+                        "detail": {
+                            "title": "Car Title",
+                            "image": "http://example.com/image.jpg"
+                        },
+                        "price": {
+                            "price": "10000"
+                        }
+                    }
+                ]
+            }
+        }
+        with patch('crawler.tasks.fetch_page', return_value=mock_response) as mock_fetch_page:
+            # Use AsyncMock for the save_to_db function to handle await
+            with patch('crawler.tasks.save_to_db', new_callable=AsyncMock) as mock_save_to_db:
+                async with aiohttp.ClientSession() as session:
+                    semaphore = asyncio.Semaphore(10)
+                    await scrape_page(session, 'https://example.com', semaphore)
+                    
+                    # Ensure save_to_db is called once
+                    mock_save_to_db.assert_called_once()
+
+    def save_to_db(cars):
+        session = create_session() # type: ignore
+        session.bulk_insert_mappings(Car, cars)
+        session.commit()
+
+    @pytest.mark.asyncio
+    async def test_save_to_db(self):
+        cars = [{'title': 'Car Title', 'price': '10000', 'image_url': 'http://example.com/image.jpg'}]
+        
+        # Pass only the cars list
+        await sync_to_async(save_to_db)(cars)
+
