@@ -2,15 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Car(models.Model):
-    # Define fields that map to the columns in your "cars" table
+
     title = models.CharField(max_length=255)
     price = models.CharField(max_length=255)
     image_url = models.CharField(max_length=255)
     # stock = models.IntegerField()
 
     class Meta:
-        managed = False  # This tells Django not to manage (create/delete) this table
-        db_table = 'cars'  # The name of the table in your database
+        managed = False  
+        db_table = 'cars'  
 
     def __str__(self):
         return self.title

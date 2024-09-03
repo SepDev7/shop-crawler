@@ -56,7 +56,6 @@ class UpdateCartItemView(APIView):
     def post(self, request, item_id):
         cart_item = get_object_or_404(CartItem, id=item_id)
         
-        # Ensure quantity is an integer
         try:
             quantity = int(request.data.get('quantity', cart_item.quantity))
         except ValueError:
@@ -73,5 +72,5 @@ class UpdateCartItemView(APIView):
 class CheckoutView(APIView):
     def post(self, request):
         cart = get_object_or_404(Cart, user=request.user)
-        cart.items.all().delete()  # Clear the cart after checkout
+        cart.items.all().delete()  
         return Response({'status': 'Checkout successful'}, status=status.HTTP_200_OK)
