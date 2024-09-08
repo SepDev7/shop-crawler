@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from .models import Car, Cart, CartItem
 from .serializers import CarSerializer, CartSerializer, CartItemSerializer, UserSerializer
 from django.shortcuts import get_object_or_404
+from rest_framework.throttling import ScopedRateThrottle
 
 class UserCreate(APIView):
     def post(self, request, format=None):
@@ -16,6 +17,9 @@ class UserCreate(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLogin(APIView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'user_login'
+
     def post(self, request, format=None):
         username = request.data.get('username')
         password = request.data.get('password')

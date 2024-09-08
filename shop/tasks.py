@@ -60,7 +60,7 @@ async def main():
     async with aiohttp.ClientSession() as session:
         tasks = []
 
-        for i in range(1, 80):
-            url = f"https://bama.ir/cad/api/search?vehicle=pride&pageIndex={i}"
+        for _ in range(1, 80):
+            url = f"https://bama.ir/cad/api/search?vehicle=pride&pageIndex={_}"
             tasks.append(scrape_page(session, url, semaphore))
         await asyncio.gather(*tasks)
