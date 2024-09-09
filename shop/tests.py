@@ -44,7 +44,7 @@ def cart_item(cart, car):
 # Test UserCreate View
 @pytest.mark.django_db
 def test_user_create_view(api_client):
-    url = reverse('user-create')  # Update the name based on your URLs
+    url = reverse('user-create')  
     data = {'username': 'newuser', 'password': 'newpass'}
     response = api_client.post(url, data)
     assert response.status_code == status.HTTP_201_CREATED
@@ -53,7 +53,7 @@ def test_user_create_view(api_client):
 # Test UserLogin View
 @pytest.mark.django_db
 def test_user_login_view(api_client, user):
-    url = reverse('user-login')  # Update the name based on your URLs
+    url = reverse('user-login')  
     data = {'username': 'testuser', 'password': 'testpass'}
     response = api_client.post(url, data)
     assert response.status_code == status.HTTP_200_OK
@@ -62,7 +62,7 @@ def test_user_login_view(api_client, user):
 # Test invalid credentials for login
 @pytest.mark.django_db
 def test_user_login_invalid_credentials(api_client):
-    url = reverse('user-login')  # Update the name based on your URLs
+    url = reverse('user-login')  
     data = {'username': 'wronguser', 'password': 'wrongpass'}
     response = api_client.post(url, data)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -71,7 +71,7 @@ def test_user_login_invalid_credentials(api_client):
 # Test UserLogout View
 @pytest.mark.django_db
 def test_user_logout_view(authenticated_client, user):
-    url = reverse('user-logout')  # Update the name based on your URLs
+    url = reverse('user-logout')  
     token = Token.objects.create(user=user)
     authenticated_client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
     response = authenticated_client.post(url)
@@ -83,7 +83,7 @@ def test_user_logout_view(authenticated_client, user):
 # Test CarListView
 @pytest.mark.django_db
 def test_car_list_view(api_client, car):
-    url = reverse('car-list')  # Update the name based on your URLs
+    url = reverse('car-list')  
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data) == 1
@@ -100,7 +100,7 @@ def test_add_to_cart_view():
     client = APIClient()
     client.force_authenticate(user=user)
 
-    url = reverse('add-to-cart', args=[car.id])  # Update the name based on your URLs
+    url = reverse('add-to-cart', args=[car.id])  
     response = client.post(url, {})
 
     assert response.status_code == 200
@@ -114,7 +114,7 @@ def test_add_to_cart_invalid_car():
     client = APIClient()
     client.force_authenticate(user=user)
 
-    url = reverse('add-to-cart', args=[999])  # Invalid Car_id, update the name based on your URLs
+    url = reverse('add-to-cart', args=[999])  
     response = client.post(url, {})
 
     assert response.status_code == 404
@@ -130,7 +130,7 @@ def test_cart_detail_view():
     client = APIClient()
     client.force_authenticate(user=user)
     
-    url = reverse('cart-detail')  # Update the name based on your URLs
+    url = reverse('cart-detail')  
     response = client.get(url)
     
     assert response.status_code == 200
@@ -149,7 +149,7 @@ def test_update_cart_item_view():
     client = APIClient()
     client.force_authenticate(user=user)
     
-    url = reverse('update-cart-item', args=[cart_item.id])  # Update the name based on your URLs
+    url = reverse('update-cart-item', args=[cart_item.id])  
     response = client.post(url, {'quantity': 2})
     
     assert response.status_code == 200
@@ -173,7 +173,7 @@ def test_checkout_view():
     client = APIClient()
     client.force_authenticate(user=user)
     
-    url = reverse('checkout')  # Update the name based on your URLs
+    url = reverse('checkout') 
     response = client.post(url)
     
     assert response.status_code == 200
@@ -188,7 +188,7 @@ def test_checkout_empty_cart():
     client = APIClient()
     client.force_authenticate(user=user)
     
-    url = reverse('checkout')  # Update the name based on your URLs
+    url = reverse('checkout')  
     response = client.post(url)
     
     assert response.status_code == 200
