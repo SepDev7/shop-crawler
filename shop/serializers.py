@@ -9,11 +9,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
         extra_kwargs = {'password': {'write_only': True}}
 
-    def create(self, validated_data):
+    @staticmethod
+    def create(validated_data):
         validated_data['password'] = make_password(validated_data['password'])
         user = User.objects.create(**validated_data)
         return user
-    
+
 
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
