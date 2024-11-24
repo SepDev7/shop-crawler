@@ -4,7 +4,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Car, Cart, CartItem
-from .serializers import CarSerializer, CartSerializer, CartItemSerializer, UserSerializer
+from .serializers import CarSerializer, CartSerializer, UserSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.throttling import ScopedRateThrottle
 from drf_yasg.utils import swagger_auto_schema
@@ -16,7 +16,7 @@ class UserCreate(APIView):
         request_body=UserSerializer,
         responses={201: UserSerializer, 400: 'Bad Request'}
     )
-    def post(self, request, format=None):
+    def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -41,7 +41,7 @@ class UserLogin(APIView):
             'token': openapi.Schema(type=openapi.TYPE_STRING)
         }), 400: 'Bad Request'}
     )
-    def post(self, request, format=None):
+    def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
@@ -55,7 +55,7 @@ class UserLogout(APIView):
     @swagger_auto_schema(
         operation_description="Logout the current user"
     )
-    def post(self, request, format=None):
+    def post(self, request):
         request.user.auth_token.delete()
         logout(request)
         return Response(status=status.HTTP_200_OK)
@@ -76,8 +76,8 @@ class AddToCartView(APIView):
         operation_description="Add a car to the user's cart",
         responses={200: 'Added to cart', 404: 'Car not found'}
     )
-    def post(self, request, Car_id):
-        car = get_object_or_404(Car, id=Car_id)
+    def post(self, request, car_id):
+        car = get_object_or_404(Car, id=car_id)
         cart, _ = Cart.objects.get_or_create(user=request.user)
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=car)
         if not created:
